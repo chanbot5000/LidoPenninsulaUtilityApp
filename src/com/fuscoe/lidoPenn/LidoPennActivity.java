@@ -14,11 +14,17 @@
 package com.fuscoe.lidoPenn;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.ImageButton;
+
 import com.esri.android.map.MapView;
 import com.esri.android.map.ags.ArcGISDynamicMapServiceLayer;
 import com.esri.android.map.ags.ArcGISTiledMapServiceLayer;
+
 
 
 public class LidoPennActivity extends Activity {
@@ -44,8 +50,18 @@ public class LidoPennActivity extends Activity {
 		mMapView.addLayer(tileLayer);		
 		mMapView.addLayer(water);	
 		
+		ImageButton layerDialogButton = (ImageButton) findViewById(R.id.layerdialogbutton);
 		
-		//mMapView.setExtent(lidoExtent); 
+		layerDialogButton.setOnClickListener(new OnClickListener() {
+			
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				Dialog d = new Dialog(LidoPennActivity.this);
+				d.setContentView(R.layout.layerdialog);				
+				d.show();
+			}
+		}); 
+		
 		
 	}
 
