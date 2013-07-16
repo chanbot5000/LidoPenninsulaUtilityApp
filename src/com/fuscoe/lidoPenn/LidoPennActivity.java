@@ -1,29 +1,22 @@
-/* Copyright 2012 ESRI
- *
- * All rights reserved under the copyright laws of the United States
- * and applicable international laws, treaties, and conventions.
- *
- * You may freely redistribute and use this sample code, with or
- * without modification, provided you include the original copyright
- * notice and use restrictions.
- *
- * See the �Sample code usage restrictions� document for further information.
- *
- */
-
 package com.fuscoe.lidoPenn;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageButton;
+import android.widget.TextView;
+import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import com.esri.android.map.MapView;
 import com.esri.android.map.ags.ArcGISDynamicMapServiceLayer;
 import com.esri.android.map.ags.ArcGISTiledMapServiceLayer;
+
 
 
 
@@ -50,21 +43,44 @@ public class LidoPennActivity extends Activity {
 		mMapView.addLayer(tileLayer);		
 		mMapView.addLayer(water);	
 		
+		//create handle on button for selecting visible layers
 		ImageButton layerDialogButton = (ImageButton) findViewById(R.id.layerdialogbutton);
 		
 		layerDialogButton.setOnClickListener(new OnClickListener() {
 			
 			public void onClick(View v) {
-				// TODO Auto-generated method stub
+
+				//created new dialog container for this activity
 				Dialog d = new Dialog(LidoPennActivity.this);
-				d.setContentView(R.layout.layerdialog);				
-				d.show();
+				
+				//set content of the dialog viewer via setContentView
+				d.setContentView(R.layout.dialog);	
+				d.setTitle("Select Layer to View");
+				d.setCanceledOnTouchOutside(true);
+				d.show(); // use dialog.dismiss(); to close the dialog after layer selection is made
+								
 			}
-		}); 
+		}); 			
+	}	
+
+	
+	public void onWaterToggled(View view){
 		
+		//is the toggle on?
+		boolean on = ((ToggleButton) view).isChecked();
+		
+		if (on){
+			//enable layer to draw
+			//but first lets toast to see if its working
+			Toast toast = Toast.makeText(LidoPennActivity.this, "water has been toggled on", 5000);
+			toast.setGravity(Gravity.CENTER, 0, 0);
+			toast.show();
+			
+		} else{
+			//remove layer from map
+		}
 		
 	}
-
 
 	@Override
 	protected void onPause() {
