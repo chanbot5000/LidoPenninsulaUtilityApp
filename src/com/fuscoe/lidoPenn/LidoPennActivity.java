@@ -16,6 +16,7 @@ import android.widget.ToggleButton;
 import com.esri.android.map.MapView;
 import com.esri.android.map.ags.ArcGISDynamicMapServiceLayer;
 import com.esri.android.map.ags.ArcGISTiledMapServiceLayer;
+import com.fuscoe.lidoPenn.R.id;
 
 
 
@@ -58,29 +59,30 @@ public class LidoPennActivity extends Activity {
 				d.setTitle("Select Layer to View");
 				d.setCanceledOnTouchOutside(true);
 				d.show(); // use dialog.dismiss(); to close the dialog after layer selection is made
-								
+				
+				d.findViewById(id.waterToggle);
+				
 			}
 		}); 			
-	}	
-
-	
-	public void onWaterToggled(View view){
 		
-		//is the toggle on?
-		boolean on = ((ToggleButton) view).isChecked();
+	// you need to call findViewById on the Dialog's view
+	// get the dialog's view and call findViewById on it
+/*
+	ToggleButton waterToggleButton = (ToggleButton) findViewById(R.id.waterToggle);
+	waterToggleButton.setOnClickListener(new OnClickListener() {
 		
-		if (on){
-			//enable layer to draw
-			//but first lets toast to see if its working
-			Toast toast = Toast.makeText(LidoPennActivity.this, "water has been toggled on", 5000);
+		public void onClick(View v) {
+			
+			Toast toast = Toast.makeText(LidoPennActivity.this, "Test toast", 5000);
 			toast.setGravity(Gravity.CENTER, 0, 0);
 			toast.show();
-			
-		} else{
-			//remove layer from map
 		}
-		
-	}
+	});*/
+	
+}
+	
+	
+	
 
 	@Override
 	protected void onPause() {
