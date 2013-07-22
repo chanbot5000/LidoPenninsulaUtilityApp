@@ -15,6 +15,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import com.esri.android.map.Layer;
 import com.esri.android.map.MapView;
 import com.esri.android.map.ags.ArcGISDynamicMapServiceLayer;
 import com.esri.android.map.ags.ArcGISTiledMapServiceLayer;
@@ -23,6 +24,7 @@ import com.fuscoe.lidoPenn.R.id;
 public class LidoPennActivity extends Activity {
 	MapView mMapView = null;
 	ArcGISTiledMapServiceLayer tileLayer;
+	int counter;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -68,73 +70,38 @@ public class LidoPennActivity extends Activity {
 		layerDialogMenu.show(fragmentTransaction, "layerDialogMenu");
 	}
 
-	public void addLayer(int layer){
-		
-		if (layer == 1){
+	public void addLayer(int layer) {
+
+		if (counter == 1) {
+			mMapView.removeLayer(1);
+		} else {
+			counter = 1;
+		}
+
+		if (layer == 1) {
 			ArcGISDynamicMapServiceLayer water = new ArcGISDynamicMapServiceLayer(
 					"http://fullcirclethinking.com/arcgisweb/rest/services/Lido/lido_water/MapServer");
 			mMapView.addLayer(water);
-		}else if (layer == 2){
+		} else if (layer == 2) {
 			ArcGISDynamicMapServiceLayer gas = new ArcGISDynamicMapServiceLayer(
 					"http://fullcirclethinking.com/arcgisweb/rest/services/Lido/lido_gas/MapServer");
 			mMapView.addLayer(gas);
-		}else if (layer == 3){
+		} else if (layer == 3) {
 			ArcGISDynamicMapServiceLayer sd = new ArcGISDynamicMapServiceLayer(
-					"http://fullcirclethinking.com/arcgisweb/rest/services/Lido/lido_sd/MapServer");
-			mMapView.addLayer(sd);
-		}else if (layer == 4){
-			ArcGISDynamicMapServiceLayer sewer = new ArcGISDynamicMapServiceLayer(
 					"http://fullcirclethinking.com/arcgisweb/rest/services/Lido/lido_sewer/MapServer");
+			mMapView.addLayer(sd);
+		} else if (layer == 4) {
+			ArcGISDynamicMapServiceLayer sewer = new ArcGISDynamicMapServiceLayer(
+					"http://fullcirclethinking.com/arcgisweb/rest/services/Lido/lido_sd/MapServer");
 			mMapView.addLayer(sewer);
-		}else if (layer == 5){
-			Toast t = Toast.makeText(LidoPennActivity.this, "Electric Dataset not yet ready for viewing", 5000);
+		} else if (layer == 5) {
+			Toast t = Toast.makeText(LidoPennActivity.this,
+					"Electric Dataset not yet ready for viewing", 5000);
 			t.setGravity(Gravity.CENTER, 0, 0);
 			t.show();
 		}
-		
+
 	}
-	
-	/*
-	public void addWaterLayer(View v) {
-			
-		ArcGISDynamicMapServiceLayer water = new ArcGISDynamicMapServiceLayer(
-				"http://fullcirclethinking.com/arcgisweb/rest/services/Lido/lido_water/MapServer");
-		mMapView.addLayer(water);
-	}
-	
-	public void addGasLayer(View v) {
-		
-		ArcGISDynamicMapServiceLayer gas = new ArcGISDynamicMapServiceLayer(
-				"http://fullcirclethinking.com/arcgisweb/rest/services/Lido/lido_gas/MapServer");
-		mMapView.addLayer(gas);
-	}
-	
-	public void addSDLayer(View v) {
-		
-		ArcGISDynamicMapServiceLayer sd = new ArcGISDynamicMapServiceLayer(
-				"http://fullcirclethinking.com/arcgisweb/rest/services/Lido/lido_sd/MapServer");
-		mMapView.addLayer(sd);
-	}
-	
-	public void addSewerLayer(View v) {		
-			
-		ArcGISDynamicMapServiceLayer sewer = new ArcGISDynamicMapServiceLayer(
-				"http://fullcirclethinking.com/arcgisweb/rest/services/Lido/lido_sewer/MapServer");
-		mMapView.addLayer(sewer);
-	}
-	
-	public void addElectricLayer(View v) {
-		
-		Toast t = Toast.makeText(LidoPennActivity.this, "Electric Dataset not yet ready for viewing", 5000);
-		t.setGravity(Gravity.CENTER, 0, 0);
-		t.show();
-		
-		
-		ArcGISDynamicMapServiceLayer electric = new ArcGISDynamicMapServiceLayer(
-				"http://fullcirclethinking.com/arcgisweb/rest/services/Lido/lido_sewer/MapServer");
-		mMapView.addLayer(sewer);
-		
-	}*/
 
 	@Override
 	protected void onPause() {
