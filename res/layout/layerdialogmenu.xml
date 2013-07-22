@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="400dp"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <Button
+        android:id="@+id/electricButton"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:text="Electric"
+        android:typeface="serif" />
+
+    <Button
+        android:id="@+id/gasButton"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:text="Gas"
+        android:typeface="serif" />
+
+    <Button
+        android:id="@+id/sewerButton"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:text="Sewer"
+        android:typeface="serif" />
+
+    <Button
+        android:id="@+id/stormDrainButton"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:text="Storm Drain"
+        android:typeface="serif" />
+
+    <Button
+        android:id="@+id/waterButton"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:text="Water"
+        android:typeface="serif" />
+
+</LinearLayout>

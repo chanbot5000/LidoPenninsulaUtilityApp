@@ -15,13 +15,16 @@ public final class R {
         public static final int layersbutton=0x7f020001;
     }
     public static final class id {
-        public static final int gasToggle=0x7f050001;
-        public static final int layerdialogbutton=0x7f050002;
-        public static final int map=0x7f050003;
-        public static final int waterToggle=0x7f050000;
+        public static final int electricButton=0x7f050000;
+        public static final int gasButton=0x7f050001;
+        public static final int layerdialogbutton=0x7f050005;
+        public static final int map=0x7f050006;
+        public static final int sewerButton=0x7f050002;
+        public static final int stormDrainButton=0x7f050003;
+        public static final int waterButton=0x7f050004;
     }
     public static final class layout {
-        public static final int dialog=0x7f030000;
+        public static final int layerdialogmenu=0x7f030000;
         public static final int main=0x7f030001;
     }
     public static final class string {
