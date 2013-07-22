@@ -43,13 +43,15 @@ public class LidoPennActivity extends Activity {
 		// Add tiled layer to MapView
 		mMapView.addLayer(tileLayer);
 
-		/* add base lines
-		ArcGISDynamicMapServiceLayer base = new ArcGISDynamicMapServiceLayer(
-				"http://fullcirclethinking.com/arcgisweb/rest/services/Lido/lido_base/MapServer");
-		mMapView.addLayer(base);*/
+		/*
+		 * add base lines ArcGISDynamicMapServiceLayer base = new
+		 * ArcGISDynamicMapServiceLayer(
+		 * "http://fullcirclethinking.com/arcgisweb/rest/services/Lido/lido_base/MapServer"
+		 * ); mMapView.addLayer(base);
+		 */
 
 		// create handle on button for selecting visible layers
-		ImageButton layerDialogButton = (ImageButton) findViewById(R.id.layerdialogbutton);
+		ImageButton layerDialogButton = (ImageButton) findViewById(R.id.layerDialogButton);
 
 		layerDialogButton.setOnClickListener(new OnClickListener() {
 
@@ -57,6 +59,24 @@ public class LidoPennActivity extends Activity {
 
 				layerDialogMenu();
 
+			}
+		});
+
+		ImageButton clearLayers = (ImageButton) findViewById(R.id.clearLayers);
+		clearLayers.setOnClickListener(new OnClickListener() {
+
+			public void onClick(View v) {
+				if (counter == 1) {
+					try {
+						mMapView.removeLayer(1);
+						counter = 0;
+					} finally {
+
+					}
+					
+				} else {
+					counter = 1;
+				}
 			}
 		});
 
