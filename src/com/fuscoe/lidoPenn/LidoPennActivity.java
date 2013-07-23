@@ -16,9 +16,11 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.esri.android.map.Layer;
+import com.esri.android.map.LocationService;
 import com.esri.android.map.MapView;
 import com.esri.android.map.ags.ArcGISDynamicMapServiceLayer;
 import com.esri.android.map.ags.ArcGISTiledMapServiceLayer;
+import com.esri.android.map.event.OnStatusChangedListener;
 import com.fuscoe.lidoPenn.R.id;
 
 public class LidoPennActivity extends Activity {
@@ -61,7 +63,7 @@ public class LidoPennActivity extends Activity {
 
 			}
 		});
-
+		
 		ImageButton clearLayers = (ImageButton) findViewById(R.id.clearLayers);
 		clearLayers.setOnClickListener(new OnClickListener() {
 
@@ -75,8 +77,23 @@ public class LidoPennActivity extends Activity {
 					}
 					
 				} else {
-					counter = 1;
+					//counter = 1;
 				}
+				String counterString = Integer.toString(counter);				
+				Toast t = Toast.makeText(LidoPennActivity.this, counterString, 5000);
+				t.show();
+			}
+		});
+		
+		//add device location to map
+		mMapView.setOnStatusChangedListener(new OnStatusChangedListener(){
+			
+			public void onStatusChanged(Object source, STATUS status) {
+				if (source == mMapView && status == STATUS.INITIALIZED){
+					LocationService ls = mMapView.getLocationService();
+					ls.setAutoPan(false);
+					ls.start();
+				}				
 			}
 		});
 
@@ -117,9 +134,23 @@ public class LidoPennActivity extends Activity {
 		} else if (layer == 5) {
 			Toast t = Toast.makeText(LidoPennActivity.this,
 					"Electric Dataset not yet ready for viewing", 5000);
-			t.setGravity(Gravity.CENTER, 0, 0);
 			t.show();
+			
+			Toast t2 = Toast.makeText(LidoPennActivity.this, "The app has become unstable and will likely crash soon", 5000);
+			t2.show();
+			
+			
+			
 		}
+		
+		String counterString = Integer.toString(counter);
+		
+		Toast t = Toast.makeText(LidoPennActivity.this, counterString, 5000);
+		t.show();
+		//Layer[] mapLayers = mMapView.getLayers();
+		//int mapLayersLength = mapLayers.length;
+		//String mapLayersToString = getString(mapLayersLength);
+		
 
 	}
 
