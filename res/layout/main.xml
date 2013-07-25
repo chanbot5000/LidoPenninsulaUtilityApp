@@ -32,6 +32,26 @@
             android:background="#a7cfed"
             android:src="@drawable/clearlayers" />
 
+        <ImageButton
+            android:id="@+id/cameraButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="15dp"
+            android:layout_marginLeft="15dp"
+            android:layout_marginTop="15dp"
+            android:background="#a7cfed"
+            android:src="@drawable/camera" />
+
+        <ImageButton
+            android:id="@+id/addDeviceLocation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="15dp"
+            android:layout_marginLeft="15dp"
+            android:layout_marginTop="15dp"
+            android:background="#a7cfed"
+            android:src="@drawable/devicelocation" />
+
     </LinearLayout>
 
     <LinearLayout
