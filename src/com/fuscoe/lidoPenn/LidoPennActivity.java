@@ -1,5 +1,7 @@
 package com.fuscoe.lidoPenn;
 
+import com.fuscoe.lidoPenn.utils.*;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
@@ -8,6 +10,8 @@ import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.location.Location;
@@ -15,6 +19,8 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.media.audiofx.BassBoost.Settings;
 import android.os.Bundle;
+import android.preference.CheckBoxPreference;
+import android.preference.PreferenceManager;
 import android.view.Gravity;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -51,12 +57,77 @@ public class LidoPennActivity extends Activity {
 	boolean deviceLocationShown = false;
 	GraphicsLayer gLayer = new GraphicsLayer();
 
+	// preference var setup
+	public static final String SHOWDEVICELOCATION = "pref_devicelocation";
+	private SharedPreferences settings;
+	private OnSharedPreferenceChangeListener listener;
+
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 		setContentView(R.layout.main);
+
+		///////
+		//test add point
+		//////
+		double x = 33.6962; 
+		double y = -117.8372;
+
+		Point p = new Point(x, y);
+		SimpleMarkerSymbol sms = new SimpleMarkerSymbol(Color.RED,
+				5, STYLE.CIRCLE);
+		Graphic graphic = new Graphic(p, sms);
+		
+		
+		
+		// //////
+		// set up preferences
+		// //////		
+		
+		settings = PreferenceManager.getDefaultSharedPreferences(this);
+		listener = new OnSharedPreferenceChangeListener() {
+
+			public void onSharedPreferenceChanged(
+					SharedPreferences sharedPreferences, String key) {
+								
+				//String deviceLocationPrefvalue = sharedPreferences.toString();
+				
+				if (key.equals(SHOWDEVICELOCATION)){
+					String b = sharedPreferences.toString();
+					if (b.equals("true")){
+						Toast t = Toast.makeText(LidoPennActivity.this, "IT EQUALS TRUE", 5000);
+						t.show();
+					}
+					//Toast t = Toast.makeText(LidoPennActivity.this, "SHOW DEVICE LOCATION YO", 5000);
+					//t.show();
+				}
+				
+				//settings.getBoolean(SHOWDEVICELOCATION, "default value");
+				//Toast t = Toast.makeText(LidoPennActivity.this, deviceLocationPrefvalue, 5000);
+				//Toast t = Toast.makeText(LidoPennActivity.this, key, 5000);
+				//t.show();
+				
+				//LidoPennActivity.this.refreshDisplay(null);
+			}
+		};
+		
+		settings.registerOnSharedPreferenceChangeListener(listener);
+
+		Button prefButton = (Button) findViewById(R.id.preferences);
+		prefButton.setOnClickListener(new OnClickListener() {
+
+			public void onClick(View v) {
+				Intent intent = new Intent(LidoPennActivity.this,
+						settingsactivity.class);
+				startActivity(intent);
+			}
+		});
+
+		// //////
+		// set up map stuff
+		// //////
 
 		// Retrieve the map and initial extent from XML layout
 		mMapView = (MapView) findViewById(R.id.map);
@@ -68,9 +139,10 @@ public class LidoPennActivity extends Activity {
 		// Add tiled layer to MapView
 		mMapView.addLayer(tileLayer);
 		mMapView.addLayer(gLayer);
+		gLayer.addGraphic(graphic);
 
 		// check if GPS is turned on, if not, prompt user to turn it on
-		checkIfGPSOn();		
+		checkIfGPSOn();
 
 		// create handle on button for selecting visible layers
 		ImageButton layerDialogButton = (ImageButton) findViewById(R.id.layerDialogButton);
@@ -84,7 +156,7 @@ public class LidoPennActivity extends Activity {
 			}
 		});
 
-		//create handler for clearing layer
+		// create handler for clearing layer
 		ImageButton clearLayers = (ImageButton) findViewById(R.id.clearLayers);
 		clearLayers.setOnClickListener(new OnClickListener() {
 
@@ -94,7 +166,7 @@ public class LidoPennActivity extends Activity {
 						mMapView.removeLayer(1);
 						counter = 0;
 					} finally {
-					
+
 					}
 
 				} else {
@@ -107,50 +179,54 @@ public class LidoPennActivity extends Activity {
 			}
 		});
 
-		//////					/////////
+		// //// /////////
 		// add device location to map////
-		//////					/////////
+		// //// /////////
 		mMapView.setOnStatusChangedListener(new OnStatusChangedListener() {
 
 			public void onStatusChanged(Object source, STATUS status) {
 				if (source == mMapView && status == STATUS.INITIALIZED) {
 					ls = mMapView.getLocationService();
 					ls.setAutoPan(true);
-					
-					
-					//addPhotoPoint(lat, lon);					
+
+					// addPhotoPoint(lat, lon);
 				}
 			}
 		});
-		
-		//when location button is clicked, add device location to map
+
+		// when location button is clicked, add device location to map
 		ImageButton locationbutton = (ImageButton) findViewById(R.id.addDeviceLocation);
 		locationbutton.setOnClickListener(new OnClickListener() {
-			
-			public void onClick(View v) {				
-				if (!deviceLocationShown){
+
+			public void onClick(View v) {
+				if (!deviceLocationShown) {
 					ls.start();
 					deviceLocationShown = true;
-					
+
 					Location loc = ls.getLocation();
-					double lat = loc.getLatitude();
-					double lon = loc.getLongitude();
+					//double lat = loc.getLatitude();
+					//double lon = loc.getLongitude();
 					
-					Point p = new Point(lat, lon);		
-					SimpleMarkerSymbol sms = new SimpleMarkerSymbol(Color.RED, 5, STYLE.CIRCLE);		
-					Graphic graphic = new Graphic(p, sms);		
-					gLayer.addGraphic(graphic);
-					
-					
-					
-				}else if(deviceLocationShown){
+					/*
+					double x = 33.6962; 
+					double y = -117.8372;
+
+					Point p = new Point(x, y);
+					SimpleMarkerSymbol sms = new SimpleMarkerSymbol(Color.RED,
+							5, STYLE.CIRCLE);
+					Graphic graphic = new Graphic(p, sms);
+					gLayer.addGraphic(graphic);*/
+
+				} else if (deviceLocationShown) {
 					ls.stop();
 					deviceLocationShown = false;
 				}
 			}
 		});
-		
-		//open camera activity for adding point to map
+
+		////////
+		// open camera activity for adding point to map
+		////////
 		ImageButton cameraButton = (ImageButton) findViewById(R.id.cameraButton);
 		cameraButton.setOnClickListener(new OnClickListener() {
 
@@ -163,9 +239,9 @@ public class LidoPennActivity extends Activity {
 			}
 		});
 
-		
-		//addPhotoPoint();
+		// addPhotoPoint();
 	}
+
 
 	public void layerDialogMenu() {
 
@@ -210,24 +286,25 @@ public class LidoPennActivity extends Activity {
 			t2.show();
 
 		}
-		
+
 		String counterString = Integer.toString(counter);
 
 		Toast t = Toast.makeText(LidoPennActivity.this, counterString, 5000);
 		t.show();
 	}
-	
-	public void addPhotoPoint(double x, double y){
-		
-		//GraphicsLayer gLayer = new GraphicsLayer();
-		/*double x = 33.6962;
-		double y = -117.8372;
-		*/
-		Point p = new Point(x,y);		
-		SimpleMarkerSymbol sms = new SimpleMarkerSymbol(Color.RED, 5, STYLE.CIRCLE);		
-		Graphic graphic = new Graphic(p, sms);		
+
+	public void addPhotoPoint(double x, double y) {
+
+		// GraphicsLayer gLayer = new GraphicsLayer();
+		/*
+		 * double x = 33.6962; double y = -117.8372;
+		 */
+		Point p = new Point(x, y);
+		SimpleMarkerSymbol sms = new SimpleMarkerSymbol(Color.RED, 5,
+				STYLE.CIRCLE);
+		Graphic graphic = new Graphic(p, sms);
 		gLayer.addGraphic(graphic);
-		//mMapView.addLayer(gLayer);
+		// mMapView.addLayer(gLayer);
 	}
 
 	public void checkIfGPSOn() {
@@ -266,6 +343,12 @@ public class LidoPennActivity extends Activity {
 			alert.show();
 
 		}
+	}
+
+	public void refreshDisplay(View v) {
+		String deviceLocationPrefValue = settings.getString(SHOWDEVICELOCATION, "not able to get value");
+		Toast toast = Toast.makeText(LidoPennActivity.this, "Checkbox is checked", 5000);
+		toast.show();
 	}
 
 	@Override

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <PreferenceCategory android:title="Map Settings" >
+        <CheckBoxPreference
+            android:key="pref_devicelocation"
+            android:summary="Shows device location on map when enabled"
+            android:title="Show Device Location" />
+    </PreferenceCategory>
+
+</PreferenceScreen>
