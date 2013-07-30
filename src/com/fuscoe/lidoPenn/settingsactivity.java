@@ -11,6 +11,7 @@ public class settingsactivity extends PreferenceActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
-		addPreferencesFromResource(R.xml.settings);
+		getFragmentManager().beginTransaction().replace(android.R.id.content, new SettingsFragment()).commit();
+		
 	}
 }

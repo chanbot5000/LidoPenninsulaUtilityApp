@@ -84,8 +84,12 @@ public class LidoPennActivity extends Activity {
 		
 		// //////
 		// set up preferences
-		// //////		
+		// //////	
 		
+		//set default values on 1st time opening app
+		PreferenceManager.setDefaultValues(this, R.xml.settings, false); 
+		
+		//variable containing key/value pairs of each preference
 		settings = PreferenceManager.getDefaultSharedPreferences(this);
 		listener = new OnSharedPreferenceChangeListener() {
 
@@ -97,19 +101,16 @@ public class LidoPennActivity extends Activity {
 				if (key.equals(SHOWDEVICELOCATION)){
 					String b = sharedPreferences.toString();
 					if (b.equals("true")){
-						Toast t = Toast.makeText(LidoPennActivity.this, "IT EQUALS TRUE", 5000);
+						Toast t = Toast.makeText(LidoPennActivity.this, "Preference is true", 5000);
+						t.show();
+					}else if(b.equals("false")){
+						Toast t = Toast.makeText(LidoPennActivity.this, "Preference is false", 5000);
 						t.show();
 					}
-					//Toast t = Toast.makeText(LidoPennActivity.this, "SHOW DEVICE LOCATION YO", 5000);
-					//t.show();
+					
 				}
 				
-				//settings.getBoolean(SHOWDEVICELOCATION, "default value");
-				//Toast t = Toast.makeText(LidoPennActivity.this, deviceLocationPrefvalue, 5000);
-				//Toast t = Toast.makeText(LidoPennActivity.this, key, 5000);
-				//t.show();
 				
-				//LidoPennActivity.this.refreshDisplay(null);
 			}
 		};
 		
@@ -204,18 +205,17 @@ public class LidoPennActivity extends Activity {
 					deviceLocationShown = true;
 
 					Location loc = ls.getLocation();
-					//double lat = loc.getLatitude();
-					//double lon = loc.getLongitude();
+					double locy = loc.getLatitude();
+					double locx = loc.getLongitude();
 					
-					/*
-					double x = 33.6962; 
-					double y = -117.8372;
-
-					Point p = new Point(x, y);
+					Point wgspoint = new Point(locx, locy);
+					Point mapPoint = (Point) GeometryEngine.project(wgspoint, SpatialReference.create(4326), mMapView.getSpatialReference());
+										
 					SimpleMarkerSymbol sms = new SimpleMarkerSymbol(Color.RED,
 							5, STYLE.CIRCLE);
-					Graphic graphic = new Graphic(p, sms);
-					gLayer.addGraphic(graphic);*/
+					Graphic graphic = new Graphic(mapPoint, sms);
+					gLayer.addGraphic(graphic);					
+					
 
 				} else if (deviceLocationShown) {
 					ls.stop();

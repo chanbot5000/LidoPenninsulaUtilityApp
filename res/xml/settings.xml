@@ -5,7 +5,8 @@
         <CheckBoxPreference
             android:key="pref_devicelocation"
             android:summary="Shows device location on map when enabled"
-            android:title="Show Device Location" />
+            android:title="Show Device Location" 
+            android:defaultValue="false"/>
     </PreferenceCategory>
 
 </PreferenceScreen>
