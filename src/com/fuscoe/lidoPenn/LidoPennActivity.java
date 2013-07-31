@@ -20,6 +20,7 @@ import android.location.LocationManager;
 import android.media.audiofx.BassBoost.Settings;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
+import android.preference.Preference;
 import android.preference.PreferenceManager;
 import android.view.Gravity;
 import android.view.View;
@@ -53,8 +54,7 @@ public class LidoPennActivity extends Activity {
 	MapView mMapView = null;
 	ArcGISTiledMapServiceLayer tileLayer;
 	int counter;
-	LocationService ls;
-	boolean deviceLocationShown = false;
+	LocationService ls;	
 	GraphicsLayer gLayer = new GraphicsLayer();
 
 	// preference var setup
@@ -69,51 +69,32 @@ public class LidoPennActivity extends Activity {
 		this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 		setContentView(R.layout.main);
 
-		///////
-		//test add point
-		//////
-		double x = 33.6962; 
-		double y = -117.8372;
-
-		Point p = new Point(x, y);
-		SimpleMarkerSymbol sms = new SimpleMarkerSymbol(Color.RED,
-				5, STYLE.CIRCLE);
-		Graphic graphic = new Graphic(p, sms);
-		
-		
-		
 		// //////
 		// set up preferences
-		// //////	
-		
-		//set default values on 1st time opening app
-		PreferenceManager.setDefaultValues(this, R.xml.settings, false); 
-		
-		//variable containing key/value pairs of each preference
-		settings = PreferenceManager.getDefaultSharedPreferences(this);
+		// //////
+
+		// set default values on 1st time opening app
+		PreferenceManager.setDefaultValues(this, R.xml.settings, false);
+
+		// variable containing key/value pairs of each preference
+		settings = PreferenceManager.getDefaultSharedPreferences(this);	
+
 		listener = new OnSharedPreferenceChangeListener() {
 
 			public void onSharedPreferenceChanged(
 					SharedPreferences sharedPreferences, String key) {
-								
-				//String deviceLocationPrefvalue = sharedPreferences.toString();
-				
-				if (key.equals(SHOWDEVICELOCATION)){
-					String b = sharedPreferences.toString();
-					if (b.equals("true")){
-						Toast t = Toast.makeText(LidoPennActivity.this, "Preference is true", 5000);
-						t.show();
-					}else if(b.equals("false")){
-						Toast t = Toast.makeText(LidoPennActivity.this, "Preference is false", 5000);
-						t.show();
-					}
-					
+
+				boolean deviceLocation = settings.getBoolean(key, false);
+
+				//logic to show/hide device location on preference change
+				if (deviceLocation == true) {
+					ls.start();					
+				} else if (deviceLocation == false) {
+					ls.stop();					
 				}
-				
-				
 			}
 		};
-		
+
 		settings.registerOnSharedPreferenceChangeListener(listener);
 
 		Button prefButton = (Button) findViewById(R.id.preferences);
@@ -140,7 +121,6 @@ public class LidoPennActivity extends Activity {
 		// Add tiled layer to MapView
 		mMapView.addLayer(tileLayer);
 		mMapView.addLayer(gLayer);
-		gLayer.addGraphic(graphic);
 
 		// check if GPS is turned on, if not, prompt user to turn it on
 		checkIfGPSOn();
@@ -188,45 +168,22 @@ public class LidoPennActivity extends Activity {
 			public void onStatusChanged(Object source, STATUS status) {
 				if (source == mMapView && status == STATUS.INITIALIZED) {
 					ls = mMapView.getLocationService();
-					ls.setAutoPan(true);
+					ls.setAutoPan(false);
 
 					// addPhotoPoint(lat, lon);
 				}
-			}
-		});
-
-		// when location button is clicked, add device location to map
-		ImageButton locationbutton = (ImageButton) findViewById(R.id.addDeviceLocation);
-		locationbutton.setOnClickListener(new OnClickListener() {
-
-			public void onClick(View v) {
-				if (!deviceLocationShown) {
-					ls.start();
-					deviceLocationShown = true;
-
-					Location loc = ls.getLocation();
-					double locy = loc.getLatitude();
-					double locx = loc.getLongitude();
-					
-					Point wgspoint = new Point(locx, locy);
-					Point mapPoint = (Point) GeometryEngine.project(wgspoint, SpatialReference.create(4326), mMapView.getSpatialReference());
-										
-					SimpleMarkerSymbol sms = new SimpleMarkerSymbol(Color.RED,
-							5, STYLE.CIRCLE);
-					Graphic graphic = new Graphic(mapPoint, sms);
-					gLayer.addGraphic(graphic);					
-					
-
-				} else if (deviceLocationShown) {
-					ls.stop();
-					deviceLocationShown = false;
+				
+				// check if device location preference is true, if true, set device
+				// location on map
+				if (settings.getBoolean(SHOWDEVICELOCATION, false) == true) {
+					ls.start();					
 				}
 			}
-		});
+		});			
 
-		////////
+		// //////
 		// open camera activity for adding point to map
-		////////
+		// //////
 		ImageButton cameraButton = (ImageButton) findViewById(R.id.cameraButton);
 		cameraButton.setOnClickListener(new OnClickListener() {
 
@@ -239,9 +196,7 @@ public class LidoPennActivity extends Activity {
 			}
 		});
 
-		// addPhotoPoint();
 	}
-
 
 	public void layerDialogMenu() {
 
@@ -295,16 +250,18 @@ public class LidoPennActivity extends Activity {
 
 	public void addPhotoPoint(double x, double y) {
 
-		// GraphicsLayer gLayer = new GraphicsLayer();
-		/*
-		 * double x = 33.6962; double y = -117.8372;
-		 */
-		Point p = new Point(x, y);
+		Location loc = ls.getLocation();
+		double locy = loc.getLatitude();
+		double locx = loc.getLongitude();
+
+		Point wgspoint = new Point(locx, locy);
+		Point mapPoint = (Point) GeometryEngine.project(wgspoint,
+				SpatialReference.create(4326), mMapView.getSpatialReference());
+
 		SimpleMarkerSymbol sms = new SimpleMarkerSymbol(Color.RED, 5,
 				STYLE.CIRCLE);
-		Graphic graphic = new Graphic(p, sms);
+		Graphic graphic = new Graphic(mapPoint, sms);
 		gLayer.addGraphic(graphic);
-		// mMapView.addLayer(gLayer);
 	}
 
 	public void checkIfGPSOn() {
@@ -346,8 +303,10 @@ public class LidoPennActivity extends Activity {
 	}
 
 	public void refreshDisplay(View v) {
-		String deviceLocationPrefValue = settings.getString(SHOWDEVICELOCATION, "not able to get value");
-		Toast toast = Toast.makeText(LidoPennActivity.this, "Checkbox is checked", 5000);
+		String deviceLocationPrefValue = settings.getString(SHOWDEVICELOCATION,
+				"not able to get value");
+		Toast toast = Toast.makeText(LidoPennActivity.this,
+				"Checkbox is checked", 5000);
 		toast.show();
 	}
 
