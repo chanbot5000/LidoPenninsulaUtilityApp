@@ -53,14 +53,15 @@ import com.fuscoe.lidoPenn.R.id;
 public class LidoPennActivity extends Activity {
 	MapView mMapView = null;
 	ArcGISTiledMapServiceLayer tileLayer;
-	int counter;
-	LocationService ls;	
+	LocationService ls;
 	GraphicsLayer gLayer = new GraphicsLayer();
 
 	// preference var setup
 	public static final String SHOWDEVICELOCATION = "pref_devicelocation";
 	private SharedPreferences settings;
 	private OnSharedPreferenceChangeListener listener;
+
+	ArcGISDynamicMapServiceLayer activeUtilityLayer;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -77,7 +78,7 @@ public class LidoPennActivity extends Activity {
 		PreferenceManager.setDefaultValues(this, R.xml.settings, false);
 
 		// variable containing key/value pairs of each preference
-		settings = PreferenceManager.getDefaultSharedPreferences(this);	
+		settings = PreferenceManager.getDefaultSharedPreferences(this);
 
 		listener = new OnSharedPreferenceChangeListener() {
 
@@ -86,18 +87,18 @@ public class LidoPennActivity extends Activity {
 
 				boolean deviceLocation = settings.getBoolean(key, false);
 
-				//logic to show/hide device location on preference change
+				// logic to show/hide device location on preference change
 				if (deviceLocation == true) {
-					ls.start();					
+					ls.start();
 				} else if (deviceLocation == false) {
-					ls.stop();					
+					ls.stop();
 				}
 			}
 		};
 
 		settings.registerOnSharedPreferenceChangeListener(listener);
 
-		Button prefButton = (Button) findViewById(R.id.preferences);
+		ImageButton prefButton = (ImageButton) findViewById(R.id.preferences);
 		prefButton.setOnClickListener(new OnClickListener() {
 
 			public void onClick(View v) {
@@ -120,12 +121,12 @@ public class LidoPennActivity extends Activity {
 
 		// Add tiled layer to MapView
 		mMapView.addLayer(tileLayer);
-		mMapView.addLayer(gLayer);
+		mMapView.addLayer(gLayer);		
 
 		// check if GPS is turned on, if not, prompt user to turn it on
 		checkIfGPSOn();
 
-		// create handle on button for selecting visible layers
+		// create handle on button for adding a layer to map
 		ImageButton layerDialogButton = (ImageButton) findViewById(R.id.layerDialogButton);
 
 		layerDialogButton.setOnClickListener(new OnClickListener() {
@@ -142,22 +143,16 @@ public class LidoPennActivity extends Activity {
 		clearLayers.setOnClickListener(new OnClickListener() {
 
 			public void onClick(View v) {
-				if (counter == 1) {
-					try {
-						mMapView.removeLayer(1);
-						counter = 0;
-					} finally {
 
-					}
-
-				} else {
-					// counter = 1;
+				try {
+					mMapView.removeLayer(activeUtilityLayer);
+				} finally {
+					Toast t = Toast.makeText(LidoPennActivity.this,
+							"Could not remove utility layer", 5000);
+					t.show();
 				}
-				String counterString = Integer.toString(counter);
-				Toast t = Toast.makeText(LidoPennActivity.this, counterString,
-						5000);
-				t.show();
 			}
+
 		});
 
 		// //// /////////
@@ -168,18 +163,16 @@ public class LidoPennActivity extends Activity {
 			public void onStatusChanged(Object source, STATUS status) {
 				if (source == mMapView && status == STATUS.INITIALIZED) {
 					ls = mMapView.getLocationService();
-					ls.setAutoPan(false);
-
-					// addPhotoPoint(lat, lon);
+					ls.setAutoPan(false);					
 				}
-				
-				// check if device location preference is true, if true, set device
-				// location on map
+
+				// check if device location preference is true, if true, set
+				// device location on map
 				if (settings.getBoolean(SHOWDEVICELOCATION, false) == true) {
-					ls.start();					
+					ls.start();
 				}
 			}
-		});			
+		});
 
 		// //////
 		// open camera activity for adding point to map
@@ -207,28 +200,32 @@ public class LidoPennActivity extends Activity {
 	}
 
 	public void addLayer(int layer) {
-
-		if (counter == 1) {
-			mMapView.removeLayer(1);
-		} else {
-			counter = 1;
+		
+		try {
+			mMapView.removeLayer(activeUtilityLayer);
+		} finally {
+			
 		}
-
+		
 		if (layer == 1) {
 			ArcGISDynamicMapServiceLayer water = new ArcGISDynamicMapServiceLayer(
 					"http://fullcirclethinking.com/arcgisweb/rest/services/Lido/lido_water/MapServer");
+			activeUtilityLayer = water;
 			mMapView.addLayer(water);
 		} else if (layer == 2) {
 			ArcGISDynamicMapServiceLayer gas = new ArcGISDynamicMapServiceLayer(
 					"http://fullcirclethinking.com/arcgisweb/rest/services/Lido/lido_gas/MapServer");
+			activeUtilityLayer = gas;
 			mMapView.addLayer(gas);
 		} else if (layer == 3) {
 			ArcGISDynamicMapServiceLayer sd = new ArcGISDynamicMapServiceLayer(
 					"http://fullcirclethinking.com/arcgisweb/rest/services/Lido/lido_sewer/MapServer");
+			activeUtilityLayer = sd;
 			mMapView.addLayer(sd);
 		} else if (layer == 4) {
 			ArcGISDynamicMapServiceLayer sewer = new ArcGISDynamicMapServiceLayer(
 					"http://fullcirclethinking.com/arcgisweb/rest/services/Lido/lido_sd/MapServer");
+			activeUtilityLayer = sewer;
 			mMapView.addLayer(sewer);
 		} else if (layer == 5) {
 			Toast t = Toast.makeText(LidoPennActivity.this,
@@ -242,10 +239,6 @@ public class LidoPennActivity extends Activity {
 
 		}
 
-		String counterString = Integer.toString(counter);
-
-		Toast t = Toast.makeText(LidoPennActivity.this, counterString, 5000);
-		t.show();
 	}
 
 	public void addPhotoPoint(double x, double y) {
