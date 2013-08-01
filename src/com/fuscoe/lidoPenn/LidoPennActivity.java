@@ -138,17 +138,19 @@ public class LidoPennActivity extends Activity {
 			}
 		});
 
+		/////////
 		// create handler for clearing layer
+		/////////
 		ImageButton clearLayers = (ImageButton) findViewById(R.id.clearLayers);
 		clearLayers.setOnClickListener(new OnClickListener() {
 
 			public void onClick(View v) {
-
-				try {
+				
+				if (activeUtilityLayer != null){
 					mMapView.removeLayer(activeUtilityLayer);
-				} finally {
-					Toast t = Toast.makeText(LidoPennActivity.this,
-							"Could not remove utility layer", 5000);
+					activeUtilityLayer = null;
+				}else{
+					Toast t = Toast.makeText(LidoPennActivity.this, "There is no active layer to remove", 5000);
 					t.show();
 				}
 			}
@@ -201,11 +203,11 @@ public class LidoPennActivity extends Activity {
 
 	public void addLayer(int layer) {
 		
-		try {
+		if (activeUtilityLayer != null){			
 			mMapView.removeLayer(activeUtilityLayer);
-		} finally {
-			
 		}
+			
+		
 		
 		if (layer == 1) {
 			ArcGISDynamicMapServiceLayer water = new ArcGISDynamicMapServiceLayer(
